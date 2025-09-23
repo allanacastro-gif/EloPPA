@@ -14,31 +14,40 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@700&display=swap');
+        
+        /* Paleta de Cores ELO PPA */
+        :root {
+            --elo-azul: #008080;   /* Azul-verdeado (Teal) */
+            --elo-verde: #8fbc8f;  /* Verde mar claro */
+            --elo-amarelo: #ffc107;/* Amarelo Âmbar */
+            --elo-rosa: #e91e63;   /* Rosa/Magenta */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #fdfaf6; /* Fundo Bege */
+            background-color: #f8f9fa; /* Fundo cinza muito claro */
         }
         .header-title {
             font-family: 'Poppins', sans-serif;
-            font-size: 2rem; /* Tamanho aumentado */
-            color: #2c5282; /* Tom de azul acinzentado */
+            font-size: 2rem;
+            color: var(--elo-azul); /* COR ATUALIZADA */
         }
         .dashboard-card {
             background-color: white;
             border-radius: 0.75rem;
             padding: 1.5rem;
-            border: 1px solid #e0e0e0; /* Borda sutil */
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05); /* Sombra mais suave */
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
             transition: all 0.3s ease-in-out;
         }
         .tab-button {
             transition: all 0.3s ease;
             border-bottom: 4px solid transparent;
-            color: #6b7280; /* Cinza para abas inativas */
+            color: #6b7280;
         }
         .tab-button.active {
-            border-bottom-color: #dd6b20; /* Laranja queimado para a borda ativa */
-            color: #dd6b20; /* Laranja queimado para o texto ativo */
+            border-bottom-color: var(--elo-amarelo); /* COR ATUALIZADA */
+            color: var(--elo-amarelo); /* COR ATUALIZADA */
             font-weight: 600;
         }
         .kpi-card {
@@ -51,7 +60,7 @@
         .kpi-value {
             font-size: 2.5rem;
             font-weight: 800;
-            color: #2c5282; /* Azul acinzentado */
+            color: var(--elo-azul); /* COR ATUALIZADA */
         }
         .kpi-label {
             font-size: 0.875rem;
@@ -65,7 +74,7 @@
         <header class="bg-white border-b border-gray-200">
             <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                 <div class="flex items-center">
-                    <img src="logo.jpg" alt="Logo ELO PPA" width="80" height="80">
+                    <img src="logo.jpg" alt="Logo ELO PPA" width="120" height="120">
                     <h1 class="ml-3 header-title">ELO PPA</h1>
                 </div>
             </div>
@@ -250,7 +259,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Reforma da Escola no Bairro Sol Nascente</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Educação</td>
                                             <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Contemplada</span></td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Educação Infantil para Todos</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Manutenção e Melhoria da Rede Escolar</td>
                                         </tr>
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Asfaltar a rua principal do Jardim Botânico</td>
@@ -309,7 +318,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="dashboard-card lg:col-span-2">
                             <h3 class="font-semibold text-gray-800 mb-4">Desempenho por Principais Áreas</h3>
                             <div class="overflow-x-auto">
@@ -351,14 +359,12 @@
                                 </table>
                             </div>
                         </div>
-
                         <div class="dashboard-card">
                             <h3 class="font-semibold text-gray-800 mb-4">Andamento das Entregas Estratégicas</h3>
                             <div class="relative h-96">
                                 <canvas id="keyDeliverablesChart"></canvas>
                             </div>
                         </div>
-
                         <div class="dashboard-card">
                             <h3 class="font-semibold text-gray-800 mb-4">Alertas e Pontos de Atenção</h3>
                             <ul class="space-y-4">
@@ -429,22 +435,25 @@
         const tabButtons = document.querySelectorAll('.tab-button');
         let activeChartInstances = {};
 
+        // Paleta de Cores ELO PPA
+        const ELO_COLORS = {
+            azul: '#008080',
+            verde: '#8fbc8f',
+            amarelo: '#ffc107',
+            rosa: '#e91e63',
+            neutro: '#d3d3d3'
+        };
+
         function changeTab(tabIndex) {
-            // Esconde todos os painéis
             dashboardPanes.forEach(pane => pane.classList.add('hidden'));
-            // Remove a classe 'active' de todos os botões
             tabButtons.forEach(button => button.classList.remove('active'));
 
-            // Mostra o painel selecionado
             dashboardPanes[tabIndex].classList.remove('hidden');
-            // Adiciona a classe 'active' ao botão clicado
             tabButtons[tabIndex].classList.add('active');
             
-            // Destrói gráficos antigos para evitar sobreposição
             Object.values(activeChartInstances).forEach(chart => chart.destroy());
             activeChartInstances = {};
 
-            // Renderiza os gráficos da aba ativa
             switch(tabIndex) {
                 case 0: renderModule1Charts(); break;
                 case 1: renderModule2Charts(); break;
@@ -453,10 +462,7 @@
             }
         }
 
-        // --- FUNÇÕES DE RENDERIZAÇÃO DOS GRÁFICOS ---
-
         function renderModule1Charts() {
-            // Gráfico 1: Status da Formulação do PPA (Donut)
             const ppaStatusCtx = document.getElementById('ppaStatusChart').getContext('2d');
             activeChartInstances.ppaStatusChart = new Chart(ppaStatusCtx, {
                 type: 'doughnut',
@@ -464,7 +470,7 @@
                     labels: ['Definido', 'Em Andamento', 'Pendente'],
                     datasets: [{
                         data: [75, 15, 10],
-                        backgroundColor: ['#60a561', '#f7b731', '#e57373'],
+                        backgroundColor: [ELO_COLORS.verde, ELO_COLORS.amarelo, ELO_COLORS.rosa],
                         borderColor: '#fff',
                         borderWidth: 4
                     }]
@@ -472,7 +478,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
             });
 
-            // Gráfico 2: Alinhamento aos ODS (Barra Horizontal)
             const odsAlignmentCtx = document.getElementById('odsAlignmentChart').getContext('2d');
             activeChartInstances.odsAlignmentChart = new Chart(odsAlignmentCtx, {
                 type: 'bar',
@@ -481,13 +486,12 @@
                     datasets: [{
                         label: 'Programas por ODS',
                         data: [18, 15, 12, 9, 7],
-                        backgroundColor: '#a3b18a'
+                        backgroundColor: ELO_COLORS.verde
                     }]
                 },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // Gráfico 3: Alocação Proposta (Pizza)
             const allocationCtx = document.getElementById('allocationChart').getContext('2d');
             activeChartInstances.allocationChart = new Chart(allocationCtx, {
                 type: 'pie',
@@ -495,13 +499,12 @@
                     labels: ['Educação', 'Saúde', 'Infraestrutura', 'Meio Ambiente', 'Outros'],
                     datasets: [{
                         data: [35, 30, 15, 10, 10],
-                        backgroundColor: ['#4a7c59', '#a3b18a', '#d4a373', '#e5e5e5', '#faedcd'],
+                        backgroundColor: [ELO_COLORS.azul, ELO_COLORS.verde, ELO_COLORS.amarelo, ELO_COLORS.rosa, ELO_COLORS.neutro],
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
             
-            // NOVO Gráfico: Marcadores Específicos (Barra Horizontal)
             const markersCtx = document.getElementById('markersChart').getContext('2d');
             activeChartInstances.markersChart = new Chart(markersCtx, {
                 type: 'bar',
@@ -510,20 +513,12 @@
                     datasets: [{
                         label: 'Orçamento Alocado (R$)',
                         data: [25, 22, 18, 15, 12],
-                        backgroundColor: '#d4a373'
+                        backgroundColor: ELO_COLORS.amarelo
                     }]
                 },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // Gráfico 5: Diagnóstico Municipal (Linha)
             const diagnosticCtx = document.getElementById('diagnosticChart').getContext('2d');
             activeChartInstances.diagnosticChart = new Chart(diagnosticCtx, {
                 type: 'line',
@@ -532,8 +527,8 @@
                     datasets: [{
                         label: 'IDH Municipal',
                         data: [0.72, 0.73, 0.75, 0.76, 0.78],
-                        borderColor: '#4a7c59',
-                        backgroundColor: 'rgba(74, 124, 89, 0.1)',
+                        borderColor: ELO_COLORS.azul,
+                        backgroundColor: 'rgba(0, 128, 128, 0.1)',
                         fill: true,
                         tension: 0.4
                     }]
@@ -543,7 +538,6 @@
         }
 
         function renderModule2Charts() {
-            // Gráfico 1: Participação por Canal (Pizza)
             const channelCtx = document.getElementById('participationChannelChart').getContext('2d');
             activeChartInstances.participationChannelChart = new Chart(channelCtx, {
                 type: 'pie',
@@ -551,13 +545,12 @@
                     labels: ['Plataforma Web', 'WhatsApp IA', 'Reuniões Presenciais'],
                     datasets: [{
                         data: [65, 25, 10],
-                        backgroundColor: ['#4a7c59', '#a3b18a', '#d4a373']
+                        backgroundColor: [ELO_COLORS.azul, ELO_COLORS.verde, ELO_COLORS.amarelo]
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
             
-            // Gráfico 3: Sugestões por Tema (Barra)
             const themeCtx = document.getElementById('suggestionsByThemeChart').getContext('2d');
             activeChartInstances.suggestionsByThemeChart = new Chart(themeCtx, {
                 type: 'bar',
@@ -566,7 +559,7 @@
                     datasets: [{
                         label: 'Número de Sugestões',
                         data: [4100, 3200, 2500, 1900, 758],
-                        backgroundColor: '#d4a373'
+                        backgroundColor: ELO_COLORS.amarelo
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
@@ -574,7 +567,6 @@
         }
 
         function renderModule3Charts() {
-            // Gráfico 1: Execução vs Metas (Combinado)
             const executionCtx = document.getElementById('executionVsGoalsChart').getContext('2d');
             activeChartInstances.executionVsGoalsChart = new Chart(executionCtx, {
                 type: 'bar',
@@ -584,13 +576,13 @@
                         {
                             label: 'Execução Financeira (%)',
                             data: [20, 45, 70, 95],
-                            backgroundColor: '#a3b18a',
+                            backgroundColor: ELO_COLORS.verde,
                             order: 1
                         },
                         {
                             label: 'Metas Físicas Alcançadas (%)',
                             data: [18, 40, 65, 92],
-                            borderColor: '#4a7c59',
+                            borderColor: ELO_COLORS.azul,
                             type: 'line',
                             fill: false,
                             tension: 0.1,
@@ -601,7 +593,6 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Gráfico 2: Desempenho IEGM (Radar)
             const iegmCtx = document.getElementById('iegmChart').getContext('2d');
             activeChartInstances.iegmChart = new Chart(iegmCtx, {
                 type: 'radar',
@@ -610,15 +601,14 @@
                     datasets: [{
                         label: 'Pontuação Municipal',
                         data: [85, 78, 92, 88, 70, 81, 90],
-                        backgroundColor: 'rgba(74, 124, 89, 0.2)',
-                        borderColor: '#4a7c59',
-                        pointBackgroundColor: '#4a7c59'
+                        backgroundColor: 'rgba(0, 128, 128, 0.2)',
+                        borderColor: ELO_COLORS.azul,
+                        pointBackgroundColor: ELO_COLORS.azul
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 100 } } }
             });
 
-            // NOVO Gráfico 3: Andamento de Entregas (Barra Horizontal)
             const keyDeliverablesCtx = document.getElementById('keyDeliverablesChart').getContext('2d');
             activeChartInstances.keyDeliverablesChart = new Chart(keyDeliverablesCtx, {
                 type: 'bar',
@@ -628,55 +618,37 @@
                         label: '% de Conclusão',
                         data: [65, 90, 20, 85, 45],
                         backgroundColor: [
-                            '#f7b731',
-                            '#60a561',
-                            '#e57373',
-                            '#60a561',
-                            '#f7b731'
+                            ELO_COLORS.amarelo,
+                            ELO_COLORS.verde,
+                            ELO_COLORS.rosa,
+                            ELO_COLORS.verde,
+                            ELO_COLORS.amarelo
                         ],
                         borderWidth: 1
                     }]
                 },
                 options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return ` ${context.raw}% concluído`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            max: 100
-                        }
-                    }
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, max: 100 } }
                 }
             });
         }
 
         function renderModule4Charts() {
-            // Gráfico 1: Participação em Cursos (Barra)
             const courseCtx = document.getElementById('courseParticipationChart').getContext('2d');
             activeChartInstances.courseParticipationChart = new Chart(courseCtx, {
                 type: 'bar',
                 data: {
                     labels: ['Gestão de Projetos', 'Orçamento Público', 'Liderança', 'Comunicação'],
                     datasets: [
-                        { label: 'Inscritos', data: [120, 95, 80, 110], backgroundColor: '#a3b18a' },
-                        { label: 'Concluintes', data: [98, 85, 71, 92], backgroundColor: '#4a7c59' }
+                        { label: 'Inscritos', data: [120, 95, 80, 110], backgroundColor: ELO_COLORS.verde },
+                        { label: 'Concluintes', data: [98, 85, 71, 92], backgroundColor: ELO_COLORS.azul }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // NOVO Gráfico 2: Nível de Satisfação (Doughnut)
             const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
             activeChartInstances.satisfactionChart = new Chart(satisfactionCtx, {
                 type: 'doughnut',
@@ -685,7 +657,7 @@
                     datasets: [{
                         label: 'Nível de Satisfação',
                         data: [1250, 780, 95, 29],
-                        backgroundColor: ['#60a561', '#a3b18a', '#f7b731', '#e57373'],
+                        backgroundColor: [ELO_COLORS.azul, ELO_COLORS.verde, ELO_COLORS.amarelo, ELO_COLORS.rosa],
                         borderColor: '#fff',
                         borderWidth: 4
                     }]
@@ -693,7 +665,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
             });
             
-             // Gráfico 3: Progresso por Secretaria (Barra)
             const departmentCtx = document.getElementById('departmentProgressChart').getContext('2d');
             activeChartInstances.departmentProgressChart = new Chart(departmentCtx, {
                 type: 'bar',
@@ -702,14 +673,13 @@
                     datasets: [{
                         label: '% de Servidores com Cursos Concluídos',
                         data: [85, 78, 92, 65, 72],
-                        backgroundColor: ['#4a7c59', '#6a994e', '#a3b18a', '#d4a373', '#faedcd'],
+                        backgroundColor: [ELO_COLORS.azul, ELO_COLORS.verde, ELO_COLORS.amarelo, ELO_COLORS.rosa, ELO_COLORS.neutro],
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
-        // Inicializa a primeira aba ao carregar a página
         window.onload = () => {
             changeTab(0);
         };
@@ -717,10 +687,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
