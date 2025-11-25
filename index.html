@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELO PPA - Protótipo Funcional</title>
+    <title>ELO PPA - Protótipo Completo</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Ícones Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -28,315 +25,523 @@
         
         .header-title { font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--elo-azul); }
         
-        /* Animação suave para os dashboards */
-        .dashboard-pane { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Animação suave */
+        .dashboard-pane { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Estilo da navegação */
-        .tab-button { border-bottom: 3px solid transparent; color: #6b7280; font-weight: 500; }
-        .tab-button:hover { color: var(--elo-azul); }
+        /* Navegação */
+        .tab-button { border-bottom: 3px solid transparent; color: #6b7280; font-weight: 500; transition: all 0.2s; }
+        .tab-button:hover { color: var(--elo-azul); background-color: rgba(0,128,128,0.05); }
         .tab-button.active { border-bottom-color: var(--elo-azul); color: var(--elo-azul); font-weight: 700; }
 
-        /* Estilo dos Cards KPI */
-        .kpi-value { font-size: 2rem; font-weight: 800; color: var(--elo-azul); }
-        
-        /* Estilo do Alerta Flutuante (Toast) */
-        #ai-toast {
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            transform: translateX(120%); /* Começa fora da tela */
-        }
+        /* KPIs */
+        .kpi-value { font-size: 1.8rem; font-weight: 800; color: var(--elo-azul); }
+        .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+
+        /* Toast IA */
+        #ai-toast { transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); transform: translateX(120%); }
         #ai-toast.show { transform: translateX(0); }
     </style>
 </head>
-<body class="antialiased flex flex-col h-screen">
+<body class="antialiased flex flex-col h-screen overflow-hidden">
 
-    <!-- HEADER -->
-    <header class="bg-white shadow-sm z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <!-- Ícone simulando logo -->
-                <div class="bg-teal-600 text-white p-2 rounded-lg">
-                    <i data-lucide="layers"></i>
+    <header class="bg-white shadow-sm z-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <img src="logo.jpg" alt="Logo ELO PPA" class="h-14 w-auto object-contain rounded-md hover:opacity-90 transition-opacity">
+                
+                <div class="border-l pl-4 border-gray-200">
+                    <h1 class="header-title font-bold tracking-tight text-teal-800 leading-none">ELO PPA</h1>
+                    <p class="text-xs text-gray-500 font-medium mt-1">Estratégia, Legado e Objetivos</p>
                 </div>
-                <h1 class="header-title text-2xl font-bold tracking-tight text-teal-700">ELO PPA</h1>
             </div>
-            <div class="text-sm text-gray-500 flex items-center gap-2">
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                Sistema Online
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex text-right">
+                    <p class="text-sm font-bold text-gray-700">Prefeitura Mun. Modelo</p>
+                    <p class="text-xs text-gray-500">Gestor: Dr. Otávio Andrade</p>
+                </div>
+                <div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 border border-gray-300">
+                    <i data-lucide="user"></i>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- NAVEGAÇÃO (ABAS) -->
-    <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <nav class="max-w-7xl mx-auto flex space-x-8 px-4 overflow-x-auto" aria-label="Tabs">
-            <button onclick="changeTab(0)" class="tab-button active py-4 px-1 whitespace-nowrap">1. Elaboração</button>
-            <button onclick="changeTab(1)" class="tab-button py-4 px-1 whitespace-nowrap">2. Participação</button>
-            <button onclick="changeTab(2)" class="tab-button py-4 px-1 whitespace-nowrap">3. Monitoramento</button>
-            <button onclick="changeTab(3)" class="tab-button py-4 px-1 whitespace-nowrap">4. Capacitação</button>
+    <div class="bg-white border-b border-gray-200 z-10">
+        <nav class="max-w-7xl mx-auto flex space-x-1 px-4 overflow-x-auto" aria-label="Tabs">
+            <button onclick="changeTab(0)" class="tab-button active py-3 px-4 whitespace-nowrap flex items-center gap-2"><i data-lucide="file-edit" size="16"></i> 1. Formulação</button>
+            <button onclick="changeTab(1)" class="tab-button py-3 px-4 whitespace-nowrap flex items-center gap-2"><i data-lucide="users" size="16"></i> 2. Participação</button>
+            <button onclick="changeTab(2)" class="tab-button py-3 px-4 whitespace-nowrap flex items-center gap-2"><i data-lucide="bar-chart-2" size="16"></i> 3. Monitoramento</button>
+            <button onclick="changeTab(3)" class="tab-button py-3 px-4 whitespace-nowrap flex items-center gap-2"><i data-lucide="graduation-cap" size="16"></i> 4. Capacitação</button>
         </nav>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
-        <div class="max-w-7xl mx-auto">
+    <main class="flex-1 overflow-y-auto bg-gray-50 p-6 scroll-smooth">
+        <div class="max-w-7xl mx-auto pb-20">
             
-            <!-- MÓDULO 1 -->
             <div id="mod0" class="dashboard-pane">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Formulação e Alinhamento Estratégico</h2>
-                    <button class="bg-teal-600 text-white px-4 py-2 rounded-md text-sm hover:bg-teal-700 transition flex items-center gap-2">
-                        <i data-lucide="file-plus" size="16"></i> Novo Programa
-                    </button>
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Painel de Formulação e Alinhamento</h2>
+                        <p class="text-sm text-gray-500">Status de elaboração do PPA 2026-2029</p>
+                    </div>
+                    <span class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-bold border border-teal-200 flex items-center gap-2"><i data-lucide="sparkles" size="12"></i> IA Ativa: Análise Preditiva</span>
                 </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Gráfico de Status -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wide">Status do PPA</h3>
-                        <div class="h-64"><canvas id="ppaStatusChart"></canvas></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Status da Formulação</h3>
+                        <div class="h-48"><canvas id="ppaStatusChart"></canvas></div>
                     </div>
-                    <!-- Gráfico ODS -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wide">Alinhamento com ODS</h3>
-                        <div class="h-64"><canvas id="odsAlignmentChart"></canvas></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Alinhamento Automático com ODS (Sugestão IA)</h3>
+                        <div class="h-48"><canvas id="odsAlignmentChart"></canvas></div>
                     </div>
-                    <!-- Tabela Normativos -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-3">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wide">Inteligência Legal: Normativos Vinculados</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full text-sm text-left">
-                                <thead class="bg-gray-50 text-gray-500 font-medium">
-                                    <tr><th class="px-4 py-3">Programa</th><th class="px-4 py-3">Base Legal Identificada (IA)</th><th class="px-4 py-3">Status</th></tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    <tr><td class="px-4 py-3 font-medium">Educação Inclusiva</td><td class="px-4 py-3">LDB 9.394/96 - Art. 58</td><td class="px-4 py-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Conforme</span></td></tr>
-                                    <tr><td class="px-4 py-3 font-medium">Saneamento Rural</td><td class="px-4 py-3">Lei 11.445/07 (Marco Saneamento)</td><td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">Revisar</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Alocação por Eixo Temático</h3>
+                        <div class="h-64"><canvas id="allocationChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Marcadores Transversais (R$)</h3>
+                        <div class="h-64"><canvas id="markersChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Diagnóstico IDH (Histórico + Predição)</h3>
+                        <div class="h-64"><canvas id="diagnosticChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Mapeamento de Normativos (Inteligência Legal)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500"><tr><th class="px-4 py-3 rounded-tl-lg">Programa</th><th class="px-4 py-3">Normativo Associado (IA)</th><th class="px-4 py-3 rounded-tr-lg">Status</th></tr></thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr><td class="px-4 py-3 font-medium">Educação para Todos</td><td class="px-4 py-3">LDB 9.394/96</td><td class="px-4 py-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Integrado</span></td></tr>
+                                <tr><td class="px-4 py-3 font-medium">Saúde da Família</td><td class="px-4 py-3">Lei 8.080/90</td><td class="px-4 py-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Integrado</span></td></tr>
+                                <tr><td class="px-4 py-3 font-medium">Saneamento Básico</td><td class="px-4 py-3">Lei 11.445/07</td><td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold">Em Análise</span></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- MÓDULO 2 -->
             <div id="mod1" class="dashboard-pane hidden">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Engajamento e Participação Cidadã</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-teal-500">
-                        <p class="text-sm text-gray-500">Total de Sugestões</p>
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Engajamento e Participação Cidadã</h2>
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200 flex items-center gap-2"><i data-lucide="message-circle" size="12"></i> Consulta Aberta</span>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-teal-500">
+                        <p class="kpi-label">Total Sugestões</p>
                         <p class="kpi-value">12.458</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
-                        <p class="text-sm text-gray-500">Via WhatsApp</p>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-green-500">
+                        <p class="kpi-label">Via WhatsApp (IA)</p>
                         <p class="kpi-value text-green-600">8.920</p>
                     </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase">Canais de Participação</h3>
-                        <div class="h-64"><canvas id="participationChannelChart"></canvas></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-yellow-500">
+                        <p class="kpi-label">Audiências Virtuais</p>
+                        <p class="kpi-value text-yellow-600">1.250</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase">Demandas por Tema</h3>
-                        <div class="h-64"><canvas id="suggestionsByThemeChart"></canvas></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-rose-500">
+                        <p class="kpi-label">Conselhos Ativos</p>
+                        <p class="kpi-value text-rose-600">12/15</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- MÓDULO 3 -->
-            <div id="mod2" class="dashboard-pane hidden">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Monitoramento e Desempenho</h2>
-                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Canais de Participação</h3>
+                        <div class="h-60"><canvas id="channelChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Nuvem de Demandas (Top Temas)</h3>
+                        <div class="h-60"><canvas id="demandChart"></canvas></div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase">Execução Financeira x Física</h3>
-                        <div class="h-64"><canvas id="executionVsGoalsChart"></canvas></div>
-                    </div>
-                    
-                    <!-- Alertas -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase flex items-center gap-2">
-                            <i data-lucide="alert-triangle" class="text-yellow-500" size="18"></i> Pontos de Atenção (IA)
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
-                                <i data-lucide="trending-down" class="text-red-500 mt-1"></i>
-                                <div>
-                                    <p class="text-sm font-bold text-red-700">Programa "Cidade Segura"</p>
-                                    <p class="text-xs text-red-600">Execução financeira 40% abaixo do cronograma físico. Risco de paralisação.</p>
-                                </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Alcance Geográfico (Mapa de Calor)</h3>
+                        <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center relative overflow-hidden group">
+                            <div class="absolute inset-0 opacity-30 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Map_of_Brazil_with_flag.svg/1200px-Map_of_Brazil_with_flag.svg.png')] bg-cover bg-center"></div>
+                            <div class="z-10 text-center">
+                                <i data-lucide="map-pin" class="mx-auto text-teal-600 mb-2" size="32"></i>
+                                <p class="text-gray-500 text-sm font-medium">Visualização Georreferenciada</p>
+                                <span class="text-xs text-gray-400">Clique para expandir</span>
                             </div>
-                            <div class="flex gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-100">
-                                <i data-lucide="clock" class="text-yellow-600 mt-1"></i>
-                                <div>
-                                    <p class="text-sm font-bold text-yellow-700">Obras de Pavimentação</p>
-                                    <p class="text-xs text-yellow-600">Avanço físico lento devido às chuvas. Necessário ajuste de meta.</p>
-                                </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Engajamento dos Conselhos</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span>Saúde</span><span class="font-bold text-green-600">100%</span></div>
+                                <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span>Educação</span><span class="font-bold text-green-600">95%</span></div>
+                                <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width: 95%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span>Criança e Adolescente</span><span class="font-bold text-yellow-600">70%</span></div>
+                                <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-yellow-500 h-2 rounded-full" style="width: 70%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span>Assistência Social</span><span class="font-bold text-red-600">40%</span></div>
+                                <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width: 40%"></div></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Devolutivas: Demandas Populares no PPA</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500"><tr><th class="px-4 py-2">Demanda</th><th class="px-4 py-2">Tema</th><th class="px-4 py-2">Status</th><th class="px-4 py-2">Ação no PPA</th></tr></thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr><td class="px-4 py-3">Creche Bairro Sol Nascente</td><td class="px-4 py-3">Educação</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">Contemplada</span></td><td class="px-4 py-3 text-gray-600">Educação Infantil para Todos</td></tr>
+                                <tr><td class="px-4 py-3">Asfalto Jd. Botânico</td><td class="px-4 py-3">Infra</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">Contemplada</span></td><td class="px-4 py-3 text-gray-600">Mobilidade Urbana</td></tr>
+                                <tr><td class="px-4 py-3">Policiamento Centro</td><td class="px-4 py-3">Segurança</td><td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">Em Análise</span></td><td class="px-4 py-3 text-gray-600">-</td></tr>
+                                <tr><td class="px-4 py-3">Parque para Cães</td><td class="px-4 py-3">Lazer</td><td class="px-4 py-3"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold">Recusada</span></td><td class="px-4 py-3 text-gray-600">Baixa prioridade orçamentária</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- MÓDULO 4 -->
-            <div id="mod3" class="dashboard-pane hidden">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Capacitação e Desenvolvimento</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4 uppercase">Adesão aos Cursos (Servidores)</h3>
-                        <div class="h-64"><canvas id="courseParticipationChart"></canvas></div>
+            <div id="mod2" class="dashboard-pane hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Monitoramento e Desempenho (BI)</h2>
+                    <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs font-bold border border-rose-200 flex items-center gap-2"><i data-lucide="activity" size="12"></i> Dados em Tempo Real</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Execução Financeira x Meta Física</h3>
+                        <div class="h-64"><canvas id="executionMixChart"></canvas></div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center justify-center text-center">
-                        <div class="p-4 bg-yellow-100 rounded-full mb-3">
-                            <i data-lucide="award" class="text-yellow-600" size="40"></i>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Radar de Efetividade (IEGM)</h3>
+                        <div class="h-64 flex justify-center"><canvas id="iegmRadarChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 lg:col-span-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Painel de Indicadores Chave (KPIs)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex justify-between mb-2"><span class="text-sm font-bold text-gray-600">Alfabetização</span><span class="text-green-600 font-bold">92%</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width: 92%"></div></div>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex justify-between mb-2"><span class="text-sm font-bold text-gray-600">Leitos Hospitalares</span><span class="text-yellow-600 font-bold">75%</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-yellow-500 h-2 rounded-full" style="width: 75%"></div></div>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex justify-between mb-2"><span class="text-sm font-bold text-gray-600">Redução CO2</span><span class="text-red-600 font-bold">40%</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width: 40%"></div></div>
+                            </div>
                         </div>
-                        <p class="text-4xl font-bold text-gray-800">873</p>
-                        <p class="text-sm text-gray-500 uppercase tracking-wide mt-1">Certificações Emitidas</p>
                     </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Desempenho por Área Estratégica</h3>
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50 text-gray-500"><tr><th class="px-4 py-2">Área</th><th class="px-4 py-2">Executado / Planejado</th><th class="px-4 py-2">%</th><th class="px-4 py-2">Status</th></tr></thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr><td class="px-4 py-2 font-medium">Saúde</td><td class="px-4 py-2 text-gray-500">R$ 45.3M / 50M</td><td class="px-4 py-2">90.6%</td><td class="px-4 py-2"><span class="text-green-600 font-bold">No Prazo</span></td></tr>
+                                <tr><td class="px-4 py-2 font-medium">Educação</td><td class="px-4 py-2 text-gray-500">R$ 60.1M / 65M</td><td class="px-4 py-2">92.4%</td><td class="px-4 py-2"><span class="text-green-600 font-bold">No Prazo</span></td></tr>
+                                <tr><td class="px-4 py-2 font-medium">Infraestrutura</td><td class="px-4 py-2 text-gray-500">R$ 15.2M / 30M</td><td class="px-4 py-2">50.6%</td><td class="px-4 py-2"><span class="text-yellow-600 font-bold">Atenção</span></td></tr>
+                                <tr><td class="px-4 py-2 font-medium">Segurança</td><td class="px-4 py-2 text-gray-500">R$ 8.1M / 20M</td><td class="px-4 py-2">40.5%</td><td class="px-4 py-2"><span class="text-red-600 font-bold">Atrasado</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 flex items-center gap-2"><i data-lucide="zap" class="text-yellow-500" size="14"></i> Alertas Preditivos</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-r">
+                                <p class="text-xs font-bold text-red-700">Programa "Cidade Segura"</p>
+                                <p class="text-[10px] text-red-600 leading-tight mt-1">Execução financeira 40% abaixo. Risco de paralisação em 2 meses.</p>
+                            </div>
+                            <div class="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded-r">
+                                <p class="text-xs font-bold text-yellow-700">Pavimentação de Vias</p>
+                                <p class="text-[10px] text-yellow-600 leading-tight mt-1">Avanço físico lento. Necessário ajuste de cronograma.</p>
+                            </div>
+                            <div class="p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r">
+                                <p class="text-xs font-bold text-blue-700">Evento de Gestão</p>
+                                <p class="text-[10px] text-blue-600 leading-tight mt-1">Revisão do PPA agendada para próxima semana.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Andamento das Entregas Estratégicas</h3>
+                    <div class="h-56"><canvas id="deliverablesChart"></canvas></div>
+                </div>
+            </div>
+
+            <div id="mod3" class="dashboard-pane hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Capacitação e Desenvolvimento Institucional</h2>
+                    <span class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-bold border border-teal-200 flex items-center gap-2"><i data-lucide="book-open" size="12"></i> Plataforma EAD Integrada</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm flex flex-col items-center justify-center py-6 border border-gray-100">
+                        <p class="kpi-value">873</p>
+                        <p class="kpi-label mt-1">Certificações</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm flex flex-col items-center justify-center py-6 border border-gray-100">
+                        <p class="kpi-value flex items-center gap-2">4.8 <i data-lucide="star" class="text-yellow-400 fill-yellow-400" size="24"></i></p>
+                        <p class="kpi-label mt-1">Avaliação Média</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm flex flex-col items-center justify-center py-6 border border-gray-100">
+                        <p class="kpi-value">2.154</p>
+                        <p class="kpi-label mt-1">Atendimentos</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm flex flex-col items-center justify-center py-6 border border-gray-100">
+                        <p class="kpi-value text-green-600">94%</p>
+                        <p class="kpi-label mt-1">Satisfação Geral</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Participação em Cursos (Inscritos vs Concluintes)</h3>
+                        <div class="h-64"><canvas id="courseChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Nível de Satisfação</h3>
+                        <div class="h-64 flex justify-center"><canvas id="satisfactionChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Progresso de Capacitação por Secretaria</h3>
+                    <div class="h-64"><canvas id="deptProgressChart"></canvas></div>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- NOTIFICAÇÃO INTELIGENTE (TOAST) -->
-    <div id="ai-toast" class="fixed top-20 right-6 bg-white p-4 rounded-lg shadow-2xl border-l-4 border-teal-500 w-80 z-50 flex gap-3 items-start">
-        <div class="mt-1 text-teal-600">
-            <i data-lucide="bot" size="24"></i>
+    <div id="ai-toast" class="fixed top-24 right-6 bg-white p-4 rounded-xl shadow-2xl border-l-4 border-teal-500 w-80 z-50 flex gap-3 items-start">
+        <div class="mt-1 text-teal-600 p-2 bg-teal-50 rounded-full">
+            <i data-lucide="bot" size="20"></i>
         </div>
         <div>
-            <h4 class="font-bold text-gray-800 text-sm mb-1">Insight da IA ELO</h4>
-            <p id="ai-message" class="text-xs text-gray-600 leading-relaxed">Analisando dados...</p>
+            <h4 class="font-bold text-gray-800 text-sm mb-1">Insight ELO IA</h4>
+            <p id="ai-message" class="text-xs text-gray-600 leading-relaxed">Processando...</p>
         </div>
-        <button onclick="closeToast()" class="text-gray-400 hover:text-gray-600 ml-auto">
+        <button onclick="document.getElementById('ai-toast').classList.remove('show')" class="text-gray-400 hover:text-gray-600 ml-auto">
             <i data-lucide="x" size="14"></i>
         </button>
     </div>
 
     <script>
-        // Configuração de Cores
-        const COLORS = { teal: '#008080', green: '#10b981', yellow: '#f59e0b', rose: '#f43f5e', gray: '#9ca3af' };
+        // CORES GLOBAIS
+        const C = { 
+            teal: '#008080', tealLight: 'rgba(0,128,128,0.2)',
+            green: '#10b981', greenLight: 'rgba(16,185,129,0.2)',
+            yellow: '#f59e0b', yellowLight: 'rgba(245,158,11,0.2)',
+            rose: '#f43f5e', roseLight: 'rgba(244,63,94,0.2)',
+            blue: '#3b82f6', gray: '#9ca3af' 
+        };
 
-        // Referências DOM
-        const panes = document.querySelectorAll('.dashboard-pane');
-        const tabs = document.querySelectorAll('.tab-button');
-        let charts = {};
+        const charts = {};
 
-        // Mensagens de IA por Módulo
-        const aiMessages = [
-            "Detectei alta correlação entre a nova meta de 'Creches' e o ODS 5 (Igualdade de Gênero). Sugiro vincular este marcador para aumentar a pontuação no IEGM.",
-            "Atenção: O canal WhatsApp está recebendo 3x mais sugestões sobre 'Iluminação Pública' nesta semana. Recomendo priorizar este tema na LDO.",
-            "Alerta de Risco: O programa de Infraestrutura consumiu 45% do orçamento, mas o avanço físico é de apenas 15%. Há indícios de desequilíbrio contratual.",
-            "Recomendação: A Secretaria de Obras tem baixa adesão ao curso de 'Nova Lei de Licitações'. Sugiro enviar um convite direto via plataforma."
+        // MENSAGENS DA IA
+        const aiInsights = [
+            "Análise Preditiva: A ação 'Creche Solidária' apresenta 92% de correlação com o ODS 5. Sugiro vinculação automática para melhorar o i-Plan.",
+            "Tendência Detectada: Aumento de 300% nas demandas sobre 'Iluminação' na Zona Norte via WhatsApp. Recomendo priorização orçamentária.",
+            "Alerta de Risco Fiscal: O ritmo de execução do programa 'Infraestrutura' está 25% abaixo da curva histórica. Risco de Restos a Pagar elevado.",
+            "Oportunidade: A Secretaria de Saúde atingiu a meta de capacitação. Sugiro emitir selo de 'Gestão Eficiente' para a equipe."
         ];
 
-        // Função de Troca de Abas
         function changeTab(index) {
-            // UI Updates
-            panes.forEach(p => p.classList.add('hidden'));
-            tabs.forEach(t => t.classList.remove('active', 'border-teal-600', 'text-teal-600'));
+            // UI
+            document.querySelectorAll('.dashboard-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active', 'border-teal-600', 'text-teal-600'));
             
-            panes[index].classList.remove('hidden');
-            tabs[index].classList.add('active', 'border-teal-600', 'text-teal-600');
+            document.getElementById(`mod${index}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-button')[index].classList.add('active', 'border-teal-600', 'text-teal-600');
 
-            // Renderizar Gráficos
-            destroyCharts();
+            // Render Charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            
             if(index === 0) renderMod1();
             if(index === 1) renderMod2();
             if(index === 2) renderMod3();
             if(index === 3) renderMod4();
 
-            // Disparar Alerta Inteligente
-            triggerAI(index);
-        }
-
-        function triggerAI(index) {
+            // Trigger AI
             const toast = document.getElementById('ai-toast');
             const msg = document.getElementById('ai-message');
-            
-            toast.classList.remove('show'); // Esconde
-            
+            toast.classList.remove('show');
             setTimeout(() => {
-                msg.textContent = aiMessages[index];
-                toast.classList.add('show'); // Mostra
-                lucide.createIcons(); // Recarrega ícones no toast se necessário
-            }, 800); // Pequeno delay para simular "pensamento"
+                msg.textContent = aiInsights[index];
+                toast.classList.add('show');
+            }, 600);
         }
 
-        function closeToast() {
-            document.getElementById('ai-toast').classList.remove('show');
-        }
-
-        // Funções de Gráficos (Chart.js)
-        function destroyCharts() {
-            Object.values(charts).forEach(c => c.destroy());
-            charts = {};
-        }
+        // --- RENDERIZADORES DE GRÁFICOS ---
 
         function renderMod1() {
+            // 1. Status PPA
             charts.ppa = new Chart(document.getElementById('ppaStatusChart'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Definido', 'Em Revisão', 'Pendente'],
-                    datasets: [{ data: [70, 20, 10], backgroundColor: [COLORS.teal, COLORS.yellow, COLORS.rose] }]
+                    labels: ['Definido', 'Em Andamento', 'Pendente'],
+                    datasets: [{ data: [70, 20, 10], backgroundColor: [C.green, C.yellow, C.rose] }]
                 },
-                options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+                options: { cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 10} } } }, maintainAspectRatio: false }
             });
 
+            // 2. ODS
             charts.ods = new Chart(document.getElementById('odsAlignmentChart'), {
                 type: 'bar',
                 data: {
                     labels: ['ODS 3 (Saúde)', 'ODS 4 (Educação)', 'ODS 11 (Cidades)', 'ODS 5 (Gênero)'],
-                    datasets: [{ label: 'Ações Vinculadas', data: [45, 38, 25, 12], backgroundColor: COLORS.green, borderRadius: 4 }]
+                    datasets: [{ label: 'Ações Vinculadas', data: [45, 38, 25, 12], backgroundColor: C.teal, borderRadius: 4 }]
                 },
-                options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+                options: { indexAxis: 'y', plugins: { legend: { display: false } }, maintainAspectRatio: false }
+            });
+
+            // 3. Alocação Temática (Restored)
+            charts.alloc = new Chart(document.getElementById('allocationChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Educação', 'Saúde', 'Infra', 'Meio Amb.', 'Outros'],
+                    datasets: [{ data: [35, 30, 15, 10, 10], backgroundColor: [C.teal, C.green, C.yellow, C.rose, C.gray] }]
+                },
+                options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }, maintainAspectRatio: false }
+            });
+
+            // 4. Marcadores (Restored)
+            charts.markers = new Chart(document.getElementById('markersChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Criança/Adolesc.', 'Sustentabilidade', 'Selo UNICEF', 'Igualdade Racial', 'Orçamento Mulher'],
+                    datasets: [{ label: 'R$ Milhões', data: [25, 22, 18, 15, 12], backgroundColor: C.yellow, borderRadius: 4 }]
+                },
+                options: { indexAxis: 'y', plugins: { legend: { display: false } }, maintainAspectRatio: false }
+            });
+
+            // 5. Diagnóstico IDH + Predição (New)
+            charts.diag = new Chart(document.getElementById('diagnosticChart'), {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Prev)'],
+                    datasets: [{
+                        label: 'IDH Municipal',
+                        data: [0.72, 0.73, 0.75, 0.76, 0.78, 0.80],
+                        borderColor: C.teal, backgroundColor: C.tealLight, fill: true, tension: 0.4, pointRadius: 4
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
         function renderMod2() {
-            charts.channel = new Chart(document.getElementById('participationChannelChart'), {
-                type: 'pie',
+            // 1. Canais
+            charts.channel = new Chart(document.getElementById('channelChart'), {
+                type: 'doughnut',
                 data: {
-                    labels: ['WhatsApp IA', 'Portal Web', 'Presencial'],
-                    datasets: [{ data: [65, 25, 10], backgroundColor: [COLORS.green, COLORS.teal, COLORS.yellow] }]
-                }
+                    labels: ['Web', 'WhatsApp IA', 'Presencial'],
+                    datasets: [{ data: [40, 50, 10], backgroundColor: [C.blue, C.green, C.yellow] }]
+                },
+                options: { cutout: '60%', plugins: { legend: { position: 'bottom' } }, maintainAspectRatio: false }
             });
-            
-            charts.theme = new Chart(document.getElementById('suggestionsByThemeChart'), {
+
+            // 2. Temas
+            charts.demand = new Chart(document.getElementById('demandChart'), {
                 type: 'bar',
                 data: {
-                    labels: ['Segurança', 'Saúde', 'Transporte', 'Lazer'],
-                    datasets: [{ label: 'Sugestões', data: [1200, 980, 850, 400], backgroundColor: COLORS.teal, borderRadius: 4 }]
-                }
+                    labels: ['Segurança', 'Saúde', 'Educação', 'Infra', 'Lazer'],
+                    datasets: [{ label: 'Sugestões', data: [4100, 3200, 2500, 1900, 758], backgroundColor: C.yellow, borderRadius: 4 }]
+                },
+                options: { plugins: { legend: { display: false } }, maintainAspectRatio: false }
             });
         }
 
         function renderMod3() {
-            charts.exec = new Chart(document.getElementById('executionVsGoalsChart'), {
-                type: 'line',
+            // 1. Execução Mista
+            charts.exec = new Chart(document.getElementById('executionMixChart'), {
+                type: 'bar',
                 data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr'],
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
                     datasets: [
-                        { label: 'Financeiro (%)', data: [10, 25, 45, 60], borderColor: COLORS.rose, tension: 0.3 },
-                        { label: 'Físico (%)', data: [10, 20, 30, 35], borderColor: COLORS.teal, tension: 0.3 }
+                        { type: 'line', label: 'Meta Física (%)', data: [20, 45, 70, 95], borderColor: C.teal, tension: 0.4 },
+                        { type: 'bar', label: 'Financeiro (%)', data: [18, 40, 65, 92], backgroundColor: C.greenLight, borderRadius: 4 }
                     ]
-                }
+                },
+                options: { maintainAspectRatio: false }
+            });
+
+            // 2. Radar IEGM (Restored)
+            charts.iegm = new Chart(document.getElementById('iegmRadarChart'), {
+                type: 'radar',
+                data: {
+                    labels: ['i-Plan', 'i-Fiscal', 'i-Educ', 'i-Saúde', 'i-GovTI', 'i-Amb'],
+                    datasets: [{ label: 'Pontuação', data: [85, 78, 92, 88, 90, 81], backgroundColor: C.tealLight, borderColor: C.teal, pointBackgroundColor: C.teal }]
+                },
+                options: { maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } } }
+            });
+
+            // 3. Entregas
+            charts.deliv = new Chart(document.getElementById('deliverablesChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Hospital Mun.', 'Escolas (10)', 'Vias (50km)', 'Digitalização', 'Parque Central'],
+                    datasets: [{ label: 'Conclusão (%)', data: [65, 90, 20, 85, 45], backgroundColor: [C.yellow, C.green, C.rose, C.green, C.yellow], borderRadius: 4 }]
+                },
+                options: { indexAxis: 'y', plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { x: { max: 100 } } }
             });
         }
 
         function renderMod4() {
-            charts.course = new Chart(document.getElementById('courseParticipationChart'), {
+            // 1. Cursos
+            charts.course = new Chart(document.getElementById('courseChart'), {
                 type: 'bar',
                 data: {
-                    labels: ['Gestão Ágil', 'Lei de Dados', 'Orçamento', 'Liderança'],
+                    labels: ['Gestão Ágil', 'Orçamento', 'Liderança', 'Comunicação'],
                     datasets: [
-                        { label: 'Inscritos', data: [150, 120, 200, 80], backgroundColor: COLORS.teal },
-                        { label: 'Concluídos', data: [130, 90, 150, 70], backgroundColor: COLORS.green }
+                        { label: 'Inscritos', data: [120, 95, 80, 110], backgroundColor: C.tealLight },
+                        { label: 'Concluintes', data: [98, 85, 71, 92], backgroundColor: C.teal }
                     ]
-                }
+                },
+                options: { maintainAspectRatio: false }
+            });
+
+            // 2. Satisfação
+            charts.sat = new Chart(document.getElementById('satisfactionChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Muito Satisfeito', 'Satisfeito', 'Neutro', 'Insatisfeito'],
+                    datasets: [{ data: [60, 30, 8, 2], backgroundColor: [C.teal, C.green, C.yellow, C.rose] }]
+                },
+                options: { cutout: '60%', plugins: { legend: { position: 'bottom' } }, maintainAspectRatio: false }
+            });
+
+            // 3. Depto
+            charts.dept = new Chart(document.getElementById('deptProgressChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Educação', 'Saúde', 'Planejamento', 'Obras', 'Adm.'],
+                    datasets: [{ label: 'Conclusão (%)', data: [85, 78, 92, 65, 72], backgroundColor: C.green, borderRadius: 4 }]
+                },
+                options: { plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { y: { max: 100 } } }
             });
         }
 
